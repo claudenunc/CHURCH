@@ -30,6 +30,16 @@
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease2: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  --gate-duration: 2.2s;
+  --gate-ease: cubic-bezier(.22,.9,.3,1);
+  --bloom-duration: 1.8s;
+  --particle-duration: 12s;
+  --reduced-motion: no-preference;
+}
+
+@media (prefers-reduced-motion: reduce){
+  :root{ --reduced-motion: reduce; }
 }
 
 /* ─── RESET ──────────────────────────────────────────────────────── */
@@ -103,51 +113,7 @@ nav.scrolled {
   padding: 120px 24px 80px;
   position: relative;
   overflow: hidden;
-}
-.hero-bg {
-  position: absolute; inset: 0; z-index: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(10,14,46,0.9) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(0,196,154,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 60%, rgba(123,97,255,0.06) 0%, transparent 60%),
-    linear-gradient(180deg, var(--dark) 0%, var(--navy) 50%, var(--dark) 100%);
-}
-.hero-noise {
-  position: absolute; inset: 0; z-index: 1;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 200px;
-}
-/* Cross icon */
-.hero-cross {
-  position: absolute; top: 18%; left: 50%; transform: translateX(-50%);
-  z-index: 2; opacity: 0.08;
-}
-.hero-cross::before {
-  content: '';
-  position: absolute; left: 50%; top: 0; transform: translateX(-50%);
-  width: 3px; height: 140px; background: var(--gold);
-}
-.hero-cross::after {
-  content: '';
-  position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
-  width: 80px; height: 3px; background: var(--gold);
-}
-
-/* Stars */
-.stars {
-  position: absolute; inset: 0; z-index: 2;
-}
-.star {
-  position: absolute;
-  width: 2px; height: 2px;
-  background: var(--gold);
-  border-radius: 50%;
-  animation: twinkle var(--d, 3s) var(--delay, 0s) infinite;
-}
-@keyframes twinkle {
-  0%, 100% { opacity: 0.1; }
-  50% { opacity: 0.6; }
+  background: var(--dark);
 }
 
 .hero-inner { position: relative; z-index: 3; max-width: 900px; }
@@ -159,8 +125,6 @@ nav.scrolled {
   text-transform: uppercase;
   color: var(--teal);
   margin-bottom: 28px;
-  opacity: 0;
-  animation: fadeUp 0.8s var(--ease) 0.2s forwards;
 }
 .hero-h1 {
   font-family: var(--font-display);
@@ -170,8 +134,6 @@ nav.scrolled {
   letter-spacing: -0.02em;
   color: var(--gold);
   margin-bottom: 16px;
-  opacity: 0;
-  animation: fadeUp 0.9s var(--ease) 0.4s forwards;
 }
 .hero-h1 em {
   font-style: italic;
@@ -185,8 +147,6 @@ nav.scrolled {
   font-style: italic;
   color: var(--muted);
   margin-bottom: 40px;
-  opacity: 0;
-  animation: fadeUp 0.9s var(--ease) 0.6s forwards;
 }
 .hero-tagline {
   font-family: var(--font-display);
@@ -195,13 +155,9 @@ nav.scrolled {
   letter-spacing: 0.06em;
   color: var(--gold2);
   margin-bottom: 52px;
-  opacity: 0;
-  animation: fadeUp 0.9s var(--ease) 0.7s forwards;
 }
 .hero-actions {
   display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-  opacity: 0;
-  animation: fadeUp 0.9s var(--ease) 0.9s forwards;
 }
 .btn-primary {
   padding: 16px 40px;
@@ -236,7 +192,6 @@ nav.scrolled {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em;
   color: var(--muted); text-transform: uppercase;
-  opacity: 0; animation: fadeIn 1s var(--ease) 1.4s forwards;
 }
 .scroll-line {
   width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent);
@@ -245,6 +200,101 @@ nav.scrolled {
 @keyframes scrollPulse {
   0%, 100% { transform: scaleY(1); opacity: 0.6; }
   50% { transform: scaleY(0.5); opacity: 1; }
+}
+
+/* ─── GATE REVEAL ANIMATIONS ─────────────────────────────────────── */
+@keyframes gate-open-left {
+  0%   { transform: rotateY(0deg) translateX(0); opacity: 1; }
+  40%  { transform: rotateY(-18deg) translateX(-6%); }
+  70%  { transform: rotateY(-28deg) translateX(-12%); }
+  100% { transform: rotateY(-32deg) translateX(-18%); }
+}
+@keyframes gate-open-right {
+  0%   { transform: rotateY(0deg) translateX(0); opacity: 1; }
+  40%  { transform: rotateY(18deg) translateX(6%); }
+  70%  { transform: rotateY(28deg) translateX(12%); }
+  100% { transform: rotateY(32deg) translateX(18%); }
+}
+@keyframes bloom {
+  0%   { opacity: 0; transform: scale(0.96); filter: blur(0px); }
+  50%  { opacity: 1; transform: scale(1.06); filter: blur(6px); }
+  100% { opacity: 0.85; transform: scale(1); filter: blur(2px); }
+}
+@keyframes particle-drift {
+  0%   { transform: translateY(0) translateX(0) scale(0.9); opacity: 0.9; }
+  50%  { transform: translateY(-18vh) translateX(6vw) scale(1.05); opacity: 0.6; }
+  100% { transform: translateY(0) translateX(0) scale(0.9); opacity: 0.9; }
+}
+
+.animate-gates #gate-left {
+  transform-origin: left center;
+  animation: gate-open-left var(--gate-duration) var(--gate-ease) forwards;
+  will-change: transform;
+}
+.animate-gates #gate-right {
+  transform-origin: right center;
+  animation: gate-open-right var(--gate-duration) var(--gate-ease) forwards;
+  will-change: transform;
+}
+.animate-gates #bg-light {
+  animation: bloom var(--bloom-duration) var(--gate-ease) forwards;
+  will-change: opacity, transform;
+}
+.animate-gates #bg-particles > * {
+  animation: particle-drift var(--particle-duration) linear infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce){
+  #gate-left, #gate-right, #bg-particles, #bg-light {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+#skip-intro {
+  position: absolute;
+  top: 100px;
+  right: 48px;
+  z-index: 10;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(10, 14, 46, 0.4);
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: opacity 0.3s, background 0.3s, color 0.3s;
+  cursor: pointer;
+}
+#skip-intro:hover {
+  background: rgba(201, 168, 76, 0.1);
+  border-color: rgba(201, 168, 76, 0.3);
+  color: var(--gold);
+}
+#skip-intro.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#hero-copy {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+#hero-copy.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+#hero-scroll {
+  opacity: 0;
+  transition: opacity 0.8s var(--ease);
+}
+#hero-scroll.visible {
+  opacity: 1;
 }
 
 /* ─── SECTION WRAPPER ────────────────────────────────────────────── */
@@ -375,24 +425,57 @@ section { padding: 120px 48px; max-width: 1200px; margin: 0 auto; }
   padding: 120px 48px;
 }
 .services-wrapper { max-width: 1200px; margin: 0 auto; }
-.pillar-tabs {
-  display: flex; gap: 0; margin-bottom: 60px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+.pillar-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 60px;
 }
-.pillar-tab {
-  padding: 16px 32px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--muted);
+.pillar-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 32px;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: color 0.2s, border-color 0.2s;
+  transition: transform 0.3s var(--ease), border-color 0.3s, background 0.3s;
+  display: flex;
+  flex-direction: column;
 }
-.pillar-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-.pillar-tab:hover:not(.active) { color: var(--off); }
+.pillar-card:hover, .pillar-card.active {
+  background: rgba(255,255,255,0.04);
+  transform: translateY(-4px);
+}
+.pillar-card.active-auto { border-color: var(--gold); }
+.pillar-card.active-amp { border-color: var(--teal); }
+.pillar-card.active-acc { border-color: var(--purp); }
+
+.pillar-card-icon {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: 0.1em;
+}
+.pillar-card-desc {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  flex: 1;
+}
+.pillar-card-cta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: gap 0.2s;
+}
+.pillar-card:hover .pillar-card-cta {
+  gap: 12px;
+}
 
 .pillar-panel { display: none; }
 .pillar-panel.active { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; }
@@ -514,6 +597,114 @@ section { padding: 120px 48px; max-width: 1200px; margin: 0 auto; }
   height: 5px; background: rgba(255,255,255,0.12); border-radius: 2px; margin-bottom: 6px;
 }
 .mockup-card-line.accent { background: var(--teal); width: 60%; }
+
+/* ─── PRAYER WALL ────────────────────────────────────────────────── */
+.prayer-section {
+  background: linear-gradient(180deg, var(--dark) 0%, var(--navy2) 100%);
+  padding: 120px 48px;
+}
+.prayer-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+}
+.prayer-wall-feed {
+  display: flex; flex-direction: column; gap: 16px;
+  max-height: 500px; overflow-y: auto; padding-right: 16px;
+}
+.prayer-card {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  padding: 24px; border-radius: 8px;
+}
+.prayer-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase;
+}
+.prayer-text { font-size: 16px; color: var(--off); line-height: 1.5; margin-bottom: 16px; }
+.prayer-actions { display: flex; gap: 12px; }
+.prayer-react {
+  background: rgba(255,255,255,0.05); border: none; padding: 6px 12px;
+  border-radius: 20px; font-family: var(--font-mono); font-size: 11px;
+  color: var(--gold); cursor: pointer; transition: background 0.2s;
+}
+.prayer-react:hover { background: rgba(255,255,255,0.1); }
+
+.prayer-form-box {
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(201,168,76,0.15);
+  padding: 40px; border-radius: 12px;
+}
+.prayer-form-title {
+  font-family: var(--font-display); font-size: 28px; font-weight: 700;
+  color: var(--off); margin-bottom: 8px;
+}
+.prayer-form-desc { font-size: 15px; color: var(--muted); margin-bottom: 24px; }
+.prayer-input {
+  width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  color: var(--off); font-family: var(--font-body); font-size: 16px; padding: 16px;
+  min-height: 120px; resize: vertical; margin-bottom: 16px; outline: none;
+}
+.prayer-input:focus { border-color: var(--gold); }
+.prayer-submit {
+  width: 100%; padding: 16px; background: var(--gold); color: var(--navy);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.15em;
+  text-transform: uppercase; font-weight: 600; cursor: pointer; border: none;
+  transition: transform 0.2s;
+}
+.prayer-submit:hover { transform: translateY(-2px); }
+
+/* ─── AI FLOATING WIDGET ─────────────────────────────────────────── */
+#ai-widget-container {
+  position: fixed; bottom: 32px; right: 32px; z-index: 999;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 16px;
+}
+#ai-widget-toggle {
+  background: var(--purp); color: var(--white);
+  border: none; border-radius: 30px;
+  padding: 12px 20px; display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em;
+  text-transform: uppercase; font-weight: 600;
+  box-shadow: 0 10px 30px rgba(123,97,255,0.3);
+  cursor: pointer; transition: transform 0.2s var(--ease);
+}
+#ai-widget-toggle:hover { transform: translateY(-4px); }
+#ai-widget-panel {
+  width: 340px; background: var(--dark); border: 1px solid rgba(123,97,255,0.2);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  opacity: 0; transform: translateY(20px) scale(0.95);
+  pointer-events: none; transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  transform-origin: bottom right;
+}
+#ai-widget-panel.open {
+  opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
+}
+.ai-widget-header {
+  background: var(--navy); padding: 16px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.ai-widget-title {
+  font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--off);
+}
+.ai-widget-close { color: var(--muted); font-size: 24px; cursor: pointer; transition: color 0.2s; }
+.ai-widget-close:hover { color: var(--off); }
+.ai-widget-body { padding: 20px; }
+.ai-widget-scope {
+  font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 24px;
+  background: rgba(123,97,255,0.05); padding: 12px; border-radius: 6px;
+  border-left: 2px solid var(--purp);
+}
+.ai-widget-actions { display: flex; flex-direction: column; gap: 10px; }
+.ai-action-btn {
+  width: 100%; padding: 12px; text-align: center;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  color: var(--off); font-family: var(--font-body); font-size: 16px;
+  border-radius: 6px; cursor: pointer; transition: background 0.2s, border-color 0.2s;
+}
+.ai-action-btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); }
+.ai-action-btn.urgent { color: #ff5f56; border-color: rgba(255,95,86,0.2); }
+.ai-action-btn.urgent:hover { background: rgba(255,95,86,0.1); }
+
 
 /* ─── COMPANION ──────────────────────────────────────────────────── */
 .companion-section {
@@ -881,7 +1072,6 @@ footer {
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
   margin-bottom: 48px;
 }
-.footer-brand { }
 .footer-logo {
   font-family: var(--font-display);
   font-size: 28px; font-weight: 700;
@@ -944,7 +1134,6 @@ footer {
   section { padding: 80px 24px; }
   .stats-bar { grid-template-columns: 1fr 1fr; padding: 24px; }
   .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
-  .stat-item:nth-child(even) { }
   .problem-grid, .web-spotlight-inner, .companion-inner,
   .podcast-inner, .about-inner { grid-template-columns: 1fr; gap: 40px; }
   .problem-cards { grid-template-columns: 1fr; }
@@ -955,7 +1144,7 @@ footer {
   .form-row { grid-template-columns: 1fr; }
   .audit-steps { flex-direction: column; }
   .audit-step { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
-  .pillar-tabs { overflow-x: auto; }
+  .pillar-cards { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -976,23 +1165,74 @@ footer {
 
 <!-- ─── HERO ─────────────────────────────────────────────────────── -->
 <div class="hero" id="home">
-  <div class="hero-bg"></div>
-  <div class="hero-noise"></div>
-  <div class="hero-cross"></div>
-  <div class="stars" id="stars"></div>
+  <!-- The background SVG Gates -->
+  <svg id="gates-hero" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ornate gates opening to a warm light, revealing Heaven's Infrastructure — we help build your church's presence." style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;">
+    <defs>
+      <radialGradient id="bloom-grad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(201,168,76,0.3)" />
+        <stop offset="40%" stop-color="rgba(201,168,76,0.1)" />
+        <stop offset="100%" stop-color="rgba(10,14,46,0)" />
+      </radialGradient>
+      <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.5"/>
+      </filter>
+      <!-- Simple fallback filigree pattern -->
+      <pattern id="filigree" patternUnits="userSpaceOnUse" width="100" height="100">
+        <path d="M50 0 C 100 25, 75 75, 50 100 C 0 75, 25 25, 50 0 Z" fill="none" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>
+      </pattern>
+    </defs>
 
-  <div class="hero-inner">
-    <div class="hero-eyebrow">Nathan Ray Michel  ·  NVVisions AI  ·  FooLiSHNeSS eNVy</div>
-    <h1 class="hero-h1">HEAVEN'S<br><em>Infrastructure</em></h1>
-    <p class="hero-sub">AI-Powered Ministry Services for the Modern Church</p>
-    <p class="hero-tagline">LOVE WINS — Destroying Hate. Building Heaven. One Conversation at a Time.</p>
+    <g id="bg">
+      <rect id="bg-rect" width="100%" height="100%" fill="#0b0b0f"/>
+      <g id="bg-light" style="opacity: 0;">
+        <circle cx="960" cy="540" r="900" fill="url(#bloom-grad)" />
+      </g>
+      <g id="bg-particles" aria-hidden="true">
+        <circle cx="800" cy="700" r="3" fill="#fff" opacity="0.4" />
+        <circle cx="1100" cy="450" r="2" fill="#fff" opacity="0.2" />
+        <circle cx="950" cy="800" r="4" fill="#C9A84C" opacity="0.3" />
+        <circle cx="860" cy="400" r="2" fill="#fff" opacity="0.5" />
+        <circle cx="1040" cy="900" r="3" fill="#C9A84C" opacity="0.1" />
+        <circle cx="700" cy="500" r="1.5" fill="#fff" opacity="0.3" />
+        <circle cx="1200" cy="550" r="2.5" fill="#fff" opacity="0.4" />
+      </g>
+    </g>
+
+    <g id="gate-left">
+      <rect width="960" height="1080" fill="#0A0E2E"/>
+      <rect width="960" height="1080" fill="url(#filigree)"/>
+      <rect x="40" y="40" width="880" height="1000" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="2"/>
+      <rect x="60" y="60" width="840" height="960" fill="none" stroke="rgba(201,168,76,0.1)" stroke-width="1"/>
+      <g id="gate-left-shadow" opacity="0.4">
+        <rect x="940" y="0" width="20" height="1080" fill="#000" filter="url(#soft-shadow)"/>
+      </g>
+    </g>
+
+    <g id="gate-right">
+      <rect x="960" width="960" height="1080" fill="#0A0E2E"/>
+      <rect x="960" width="960" height="1080" fill="url(#filigree)"/>
+      <rect x="1000" y="40" width="880" height="1000" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="2"/>
+      <rect x="1020" y="60" width="840" height="960" fill="none" stroke="rgba(201,168,76,0.1)" stroke-width="1"/>
+      <g id="gate-right-shadow" opacity="0.4">
+        <rect x="960" y="0" width="20" height="1080" fill="#000" filter="url(#soft-shadow)"/>
+      </g>
+    </g>
+  </svg>
+
+  <button id="skip-intro">Skip the welcome</button>
+
+  <div class="hero-inner" id="hero-copy" aria-hidden="true">
+    <div class="hero-eyebrow">Nathan Ray Michel · NVVisions AI · FooLiSHNeSS eNVy</div>
+    <h1 class="hero-h1">Welcome Home.</h1>
+    <p class="hero-sub">A sacred entrance to practical ministry tools — strategy, technology, and care.</p>
+    <p class="hero-tagline">We'll Help You Build Your Church's Presence.</p>
     <div class="hero-actions">
-      <a href="#audit" class="btn-primary">Book Your Free Audit</a>
-      <a href="#services" class="btn-ghost">See What We Build</a>
+      <a href="#audit" class="btn-primary" id="primary-cta" tabindex="-1">Book a Free Audit</a>
+      <a href="#services" class="btn-ghost" tabindex="-1">See What We Build</a>
     </div>
   </div>
 
-  <div class="hero-scroll">
+  <div class="hero-scroll" id="hero-scroll">
     <div class="scroll-line"></div>
     <span>Scroll</span>
   </div>
@@ -1058,10 +1298,22 @@ footer {
 
     <br><br>
 
-    <div class="pillar-tabs">
-      <button class="pillar-tab active" onclick="showPillar('auto',this)">Automate</button>
-      <button class="pillar-tab" onclick="showPillar('amp',this)">Amplify</button>
-      <button class="pillar-tab" onclick="showPillar('acc',this)">Accompany</button>
+    <div class="pillar-cards reveal reveal-delay-2">
+      <div class="pillar-card active active-auto" onclick="showPillar('auto', this)">
+        <div class="pillar-card-icon" style="color: var(--gold)">AUTOMATE</div>
+        <p class="pillar-card-desc">Free your team from busywork. Automations for giving, follow-up, and scheduling.</p>
+        <span class="pillar-card-cta">See how Automate works &rarr;</span>
+      </div>
+      <div class="pillar-card" onclick="showPillar('amp', this)">
+        <div class="pillar-card-icon" style="color: var(--teal)">AMPLIFY</div>
+        <p class="pillar-card-desc">Get found. Local landing pages, SEO, and social storytelling that bring people in.</p>
+        <span class="pillar-card-cta" style="color: var(--teal)">Show me local landing examples &rarr;</span>
+      </div>
+      <div class="pillar-card" onclick="showPillar('acc', this)">
+        <div class="pillar-card-icon" style="color: var(--purp)">ACCOMPANY</div>
+        <p class="pillar-card-desc">24/7 pastoral presence. AI companion with human escalation and real care.</p>
+        <span class="pillar-card-cta" style="color: var(--purp)">Talk to the Companion &rarr;</span>
+      </div>
     </div>
 
     <div id="panel-auto" class="pillar-panel active">
@@ -1153,6 +1405,38 @@ footer {
         </div>
       </div>
       <p style="text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:16px;letter-spacing:0.1em">DELIVERED IN DAYS — NOT MONTHS</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PRAYER WALL MVP ──────────────────────────────────────────── -->
+<div class="prayer-section" id="prayer">
+  <div class="prayer-inner">
+    <div class="reveal">
+      <div class="section-label">Interactive Prayer Wall</div>
+      <h2 class="section-h2">A community of <span class="accent">care.</span></h2>
+      <p class="section-lead">Visitors can submit requests interactively. Your staff can review, moderate, and route care where it's needed most.</p>
+      <br>
+      <div class="prayer-wall-feed">
+        <div class="prayer-card">
+          <div class="prayer-meta"><span>Anonymous</span><span>2 hrs ago</span></div>
+          <div class="prayer-text">Praying for my mother who goes into surgery tomorrow morning. We're anxious but trusting God.</div>
+          <div class="prayer-actions"><button class="prayer-react">Praying 🙏</button></div>
+        </div>
+        <div class="prayer-card">
+          <div class="prayer-meta"><span>David P.</span><span>5 hrs ago</span></div>
+          <div class="prayer-text">Looking for wisdom regarding a major career change. That I might follow the path not of least resistance, but of greatest purpose.</div>
+          <div class="prayer-actions"><button class="prayer-react">Praying 🙏</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="prayer-form-box">
+        <h3 class="prayer-form-title">Share a Prayer</h3>
+        <p class="prayer-form-desc">This is a safe space. Your request will be reviewed by our pastoral staff before appearing to the public.</p>
+        <textarea class="prayer-input" placeholder="Type your prayer request here..."></textarea>
+        <button class="prayer-submit" onclick="submitPrayer(this)">Submit Request</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1362,7 +1646,11 @@ footer {
         <input type="text" class="form-input" placeholder="No marketing staff, outdated website, member follow-up, etc.">
       </div>
       <button class="form-submit" onclick="handleSubmit(this)">Book Your Free Church Audit</button>
-      <p class="form-note">No invoice. No contract. You give what God puts on your heart.</p>
+      <div style="text-align: center; margin-top: 16px;">
+        <span style="color: var(--muted); font-size: 14px;">Prefer to skip the form?</span>
+        <a href="#" style="color: var(--gold); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; margin-left: 8px; border-bottom: 1px dashed rgba(201,168,76,0.4); padding-bottom: 2px; transition: border-color 0.2s;">Schedule on our Calendar</a>
+      </div>
+      <p class="form-note" style="margin-top:24px">No invoice. No contract. You give what God puts on your heart.</p>
     </div>
   </div>
 </div>
@@ -1410,22 +1698,84 @@ footer {
   </div>
 </footer>
 
+<!-- ─── AI COMPANION WIDGET ──────────────────────────────────────── -->
+<div id="ai-widget-container">
+  <div id="ai-widget-panel">
+    <div class="ai-widget-header">
+      <div class="ai-widget-title">Pastoral Companion</div>
+      <button class="ai-widget-close" onclick="toggleCompanion()">&times;</button>
+    </div>
+    <div class="ai-widget-body">
+      <p class="ai-widget-scope">This companion offers caring guidance and routes urgent needs to staff. Not a replacement for emergency services.</p>
+      <div class="ai-widget-actions">
+        <button class="ai-action-btn">Ask a question</button>
+        <button class="ai-action-btn">Share a prayer</button>
+        <button class="ai-action-btn urgent">I need urgent help</button>
+      </div>
+    </div>
+  </div>
+  <button id="ai-widget-toggle" aria-label="Open Pastoral Companion" onclick="toggleCompanion()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    <span>Companion</span>
+  </button>
+</div>
+
 <!-- ─── JS ────────────────────────────────────────────────────────── -->
 <script>
-// Stars
-const starsEl = document.getElementById('stars');
-for (let i = 0; i < 60; i++) {
-  const star = document.createElement('div');
-  star.className = 'star';
-  star.style.cssText = `
-    left: ${Math.random()*100}%;
-    top: ${Math.random()*100}%;
-    --d: ${2 + Math.random()*4}s;
-    --delay: ${Math.random()*4}s;
-    opacity: ${0.1 + Math.random()*0.3};
-  `;
-  starsEl.appendChild(star);
+// Hero Reveal Animation
+const hero = document.getElementById('home');
+const gatesHero = document.getElementById('gates-hero');
+const skipBtn = document.getElementById('skip-intro');
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function revealHero() {
+  if (prefersReduced) {
+    // Media query handles setting it immediately
+    showHeroCopy();
+    return;
+  }
+  
+  gatesHero.classList.add('animate-gates');
+  
+  // Wait to show the copy and CTA after the animation finishes
+  setTimeout(showHeroCopy, 2200); 
 }
+
+function showHeroCopy() {
+  const copy = document.getElementById('hero-copy');
+  const scroll = document.getElementById('hero-scroll');
+  const primaryCta = document.getElementById('primary-cta');
+  const secondaryCta = document.querySelector('.btn-ghost');
+  
+  copy.setAttribute('aria-hidden', 'false');
+  copy.classList.add('visible');
+  scroll.classList.add('visible');
+  skipBtn.classList.add('hidden');
+  
+  // Make focusable
+  if (primaryCta) primaryCta.removeAttribute('tabindex');
+  if (secondaryCta) secondaryCta.removeAttribute('tabindex');
+  
+  // Optional: automatically focus
+  // if (primaryCta) primaryCta.focus();
+}
+
+skipBtn.addEventListener('click', () => {
+  // Immediately set to final state via a new class or inline styles
+  document.querySelector('#gate-left').style.transition = 'none';
+  document.querySelector('#gate-right').style.transition = 'none';
+  document.querySelector('#bg-light').style.transition = 'none';
+  
+  document.querySelector('#gate-left').style.transform = 'rotateY(-32deg) translateX(-18%)';
+  document.querySelector('#gate-right').style.transform = 'rotateY(32deg) translateX(18%)';
+  document.querySelector('#bg-light').style.opacity = '0.85';
+  
+  showHeroCopy();
+});
+
+// Start after LCP or DOMContentLoaded
+if (document.readyState === 'complete') revealHero();
+else window.addEventListener('load', revealHero);
 
 // Nav scroll
 const nav = document.getElementById('nav');
@@ -1433,12 +1783,15 @@ window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// Pillar tabs
+// Pillar cards
 function showPillar(id, btn) {
   document.querySelectorAll('.pillar-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.pillar-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pillar-card').forEach(t => {
+    t.classList.remove('active', 'active-auto', 'active-amp', 'active-acc');
+  });
   document.getElementById('panel-' + id).classList.add('active');
   btn.classList.add('active');
+  btn.classList.add('active-' + id);
 }
 
 // Reveal on scroll
@@ -1453,6 +1806,18 @@ function handleSubmit(btn) {
   btn.textContent = 'Request Submitted — We\'ll Be in Touch!';
   btn.style.background = 'var(--teal)';
   btn.disabled = true;
+}
+
+// Prayer wall submission
+function submitPrayer(btn) {
+  btn.textContent = 'Submitted for Review';
+  btn.style.background = 'var(--teal)';
+  btn.disabled = true;
+}
+
+// AI Companion Toggle
+function toggleCompanion() {
+  document.getElementById('ai-widget-panel').classList.toggle('open');
 }
 </script>
 </body>
