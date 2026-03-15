@@ -109,61 +109,36 @@ nav.scrolled {
 }
 .nav-cta:hover { background: var(--gold); color: var(--navy); }
 
-/* ─── HERO ───────────────────────────────────────────────────────── */
-.hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  text-align: center;
-  padding: 120px 24px 80px;
-  position: relative;
-  overflow: hidden;
-  background: var(--dark);
+/* ─── HERO MVP TOKENS ────────────────────────────────────────────── */
+.hero-wrapper { 
+  position:relative; 
+  height:65vh; 
+  background:var(--dark); 
+  overflow:hidden; 
+  color:var(--white); 
+}
+@media(min-width:1024px){
+  .hero-wrapper { height: 100vh; }
 }
 
-.hero-inner { position: relative; z-index: 3; max-width: 900px; }
-
-.hero-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--teal);
-  margin-bottom: 28px;
+.hero-poster { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+.hero-svg { position:absolute; inset:0; z-index:1; pointer-events:none; }
+.hero-overlay { 
+  position:relative; 
+  z-index:2; 
+  display:flex; 
+  flex-direction:column; 
+  align-items:center; 
+  justify-content:center; 
+  text-align:center; 
+  padding:24px; 
+  height: 100%;
+  background:linear-gradient(180deg, rgba(11,11,18,0.12), rgba(11,11,18,0.48)); 
 }
-.hero-h1 {
-  font-family: var(--font-display);
-  font-size: clamp(64px, 10vw, 120px);
-  font-weight: 700;
-  line-height: 0.9;
-  letter-spacing: -0.02em;
-  color: var(--gold);
-  margin-bottom: 16px;
+.hero-ctas {
+  display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 32px;
 }
-.hero-h1 em {
-  font-style: italic;
-  font-weight: 300;
-  color: var(--off);
-}
-.hero-sub {
-  font-family: var(--font-display);
-  font-size: clamp(18px, 2.5vw, 26px);
-  font-weight: 300;
-  font-style: italic;
-  color: var(--muted);
-  margin-bottom: 40px;
-}
-.hero-tagline {
-  font-family: var(--font-display);
-  font-size: clamp(14px, 1.8vw, 18px);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--gold2);
-  margin-bottom: 52px;
-}
-.hero-actions {
-  display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-}
-.btn-primary {
+.cta-primary {
   padding: 16px 40px;
   background: linear-gradient(90deg, var(--gold), var(--color-altar));
   color: var(--off);
@@ -173,22 +148,29 @@ nav.scrolled {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
 }
-.btn-primary:hover {
+.cta-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 40px rgba(184, 90, 42, 0.4);
 }
-.btn-ghost {
+.cta-secondary {
   padding: 16px 40px;
-  border: 1px solid rgba(201,168,76,0.4);
+  border: 1px solid rgba(217,179,106,0.4);
   color: var(--off);
   font-family: var(--font-mono);
   font-size: 13px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: border-color 0.2s, color 0.2s;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
 }
-.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.cta-secondary:hover { border-color: var(--gold); color: var(--gold); }
 
 .hero-scroll {
   position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
@@ -238,25 +220,28 @@ nav.scrolled {
 #bg-particles > * { animation: particle-drift var(--particle-duration) linear infinite; will-change: transform, opacity; }
 
 @media (prefers-reduced-motion: reduce){
-  .animate-gates #gate-left, .animate-gates #gate-right, #bg-particles, #bg-bloom { animation: none !important; transform: none !important; opacity: 1 !important; }
+  .hero-svg, .animate-gates #gate-left, .animate-gates #gate-right, #bg-particles, #bg-bloom { animation: none !important; transform: none !important; opacity: 1 !important; }
 }
 
-#skip-intro {
+.skip-intro {
   position: absolute;
-  top: 100px;
-  right: 48px;
+  top: 18px;
+  right: 18px;
   z-index: 10;
-  color: var(--muted);
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
-  background: rgba(10, 14, 46, 0.4);
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: opacity 0.3s, background 0.3s, color 0.3s;
+  backdrop-filter: blur(8px);
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+.skip-intro:hover {
+  background: rgba(201,168,76,0.1);
 }
 #skip-intro:hover {
   background: rgba(201, 168, 76, 0.1);
@@ -1152,7 +1137,7 @@ footer {
 </nav>
 
 <!-- ─── HERO ─────────────────────────────────────────────────────── -->
-<div class="hero" id="home">
+<div id="gates-hero-wrapper" class="hero-wrapper" role="region" aria-label="Ornate gates opening to a warm light">
   <!-- The responsive LCP hero poster -->
   <picture style="position: absolute; inset: 0; width: 100%; height: 100%; display:block; z-index:0;">
     <source type="image/avif" srcset="/assets/hero-3840.avif 3840w, /assets/hero-1920.avif 1920w, /assets/hero-1280.avif 1280w" sizes="100vw">
@@ -1276,23 +1261,16 @@ footer {
     </g>
   </svg>
 
-  <button id="skip-intro" class="skip-intro">Skip the welcome</button>
-
-  <div class="hero-inner" id="hero-copy-html" aria-hidden="true" aria-live="polite">
-    <div class="hero-eyebrow">Nathan Ray Michel · NVVisions AI · FooLiSHNeSS eNVy</div>
-    <h1 class="hero-h1">Welcome Home.</h1>
-    <p class="hero-sub" style="color:var(--text-secondary)">We'll Help You Build Your Church's Presence.</p>
-    <p class="hero-tagline" style="color:var(--color-gold)">A sacred entrance to modern ministry — strategy, technology, and care that meet people where they are.</p>
-    <div class="hero-actions">
-      <a href="#audit" class="cta-primary" id="primary-cta" tabindex="-1">Begin Your Free Audit</a>
-      <a href="#services" class="btn-ghost" tabindex="-1">See Our Work</a>
+  <div id="hero-copy-html" class="hero-overlay" aria-hidden="true" aria-live="polite">
+    <h1>Welcome Home. We’ll Help You Build Your Church’s Presence.</h1>
+    <p>A sacred entrance to modern ministry — strategy, technology, and care that meet people where they are.</p>
+    <div class="hero-ctas">
+      <button id="primary-cta" class="cta-primary">Begin Your Free Audit</button>
+      <a href="/work" class="cta-secondary">See Our Work</a>
     </div>
   </div>
 
-  <div class="hero-scroll" id="hero-scroll">
-    <div class="scroll-line"></div>
-    <span>Scroll</span>
-  </div>
+  <button id="skip-intro" class="skip-intro" aria-controls="hero-copy-html">Skip the welcome</button>
 </div>
 
 <!-- ─── STATS BAR ────────────────────────────────────────────────── -->

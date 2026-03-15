@@ -1,0 +1,13 @@
+{
+  "name": "heavens-infrastructure",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "three": "^0.158.0",
+    "lottie-web": "^5.10.1"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  }
+}

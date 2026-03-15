@@ -1,174 +1,126 @@
-# Cinematic Hero Implementation Handoff
+# Final Developer Handoff Manifest: Cinematic Gates Hero
 
-## 1. Project summary and success criteria
-**Summary:** Full‑bleed hero that visually opens ornate gates and reveals headline + three pillar CTAs. Primary implementation: Three.js WebGL cathedral interior with shadered holographic gates and pointer-driven interaction. Fallbacks: SVG mask + CSS animation, Lottie (optional), and poster WebP/AVIF for low-power or reduced‑motion users.
+This is the compact, copy‑paste dev manifest and single source of truth for the Gates Open hero MVP → enhancement rollout.
 
-**Success metrics**
-- LCP ≤ 2.5s (mobile 4G, hero poster first paint)
-- CLS < 0.1
-- Time to interactive (hero controls) ≤ 2.5s
-- Skip Intro click rate < 10% (target)
-- Primary CTA conversion lift vs current baseline
-
-## 2. Asset inventory and exact specs
-| Asset | Purpose | Deliverable(s) | Target size |
+## 1. Asset Manifest (filenames, MIME types, target sizes)
+| Filename | Purpose | MIME Type | Target size |
 | --- | --- | --- | --- |
-| Hero poster | LCP-first fallback | WebP 1920×1080; WebP 1280×720; AVIF variants | ≤150 KB (mobile) |
-| Hero hi‑res | Full hero for desktop/retina | WebP 3840×2160; AVIF | ≤600 KB (desktop progressive) |
-| SVG gates (master) | SVG mask + CSS fallback | gates-hero-master.svg (layered, named groups) + optimized gates-hero.svg | |
-| GLTF scene | WebGL 3D scene | cathedral-scene.glb (Draco compressed) + LODs | ≤ 600–900 KB (mobile LOD) |
-| Baked lightmaps | Mobile fallback for depth | PNG/WEBP lightmaps for GLTF | small tiles, each ≤ 120 KB |
-| Lottie JSON | Vector animation fallback | gates-hero.lottie.json | ≤ 200 KB |
-| Audio | Optional ambient loop | AAC/MP3 8–12s, user-initiated | ≤ 150 KB (short loop) |
-| Portraits & stained glass | Social proof & sections | WebP/AVIF multiple sizes (see image strategy) | per image ≤ 200 KB |
-| Design frames | Handoff frames for animation timing | PNG frames: 0%,25%,50%,75%,90%,100% | each ≤ 200 KB |
+| `/assets/hero-1280.webp` | Poster-first mobile hero | `image/webp` | ≤ 150 KB |
+| `/assets/hero-1920.webp` | Poster hero (desktop) | `image/webp` | ≤ 300 KB |
+| `/assets/hero-3840.avif` | High-res hero for large screens | `image/avif` | ≤ 600 KB |
+| `/assets/gates-hero.svg` | Optimized SVG mask + groups | `image/svg+xml` | ≤ 80 KB |
+| `/assets/gates-hero-master.svg`| Editable layered SVG (design) | `image/svg+xml` | source file |
+| `/assets/gates-hero.lottie.json`| Optional Lottie fallback | `application/json`| ≤ 200 KB |
+| `/assets/cathedral-scene-draco.glb`| Three.js GLTF scene (Draco) | `model/gltf-binary`| 600–900 KB (mobile) |
+| `/assets/lightmap-tiles/*.webp`| Baked lightmaps for mobile LOD | `image/webp` | each ≤ 120 KB |
+| `/assets/audio/ambient-loop.aac`| User-initiated ambient loop | `audio/aac` | ≤ 150 KB |
+| `/assets/portraits/portrait-01.webp`| Social proof portrait examples| `image/webp` | ≤ 200 KB each |
+| `/assets/frames/frame-*.png` | Animation keyframe exports | `image/png` | ≤ 200 KB each |
 
-**Licensing & legal**
-- Use extended/commercial license for hero images or secure property/model releases for custom shoot.
-- If using stock, prefer editorial/rights-managed hero images or extended license.
-
-## 3. Exact SVG layer breakdown and defs (paste-ready)
-```svg
-<!-- gates-hero-master.svg (excerpt) -->
-<svg id="gates-hero" viewBox="0 0 1920 1080" role="img" aria-label="Ornate gates opening to a warm light, revealing Heaven's Infrastructure — we help build your church's presence." preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <!-- Soft shadow filter -->
-    <filter id="soft-shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="8" result="b"/>
-      <feOffset dx="0" dy="6" result="o"/>
-      <feMerge><feMergeNode in="o"/><feMergeNode in="b"/></feMerge>
-    </filter>
-
-    <!-- Bloom radial -->
-    <radialGradient id="bloom" cx="50%" cy="40%" r="60%">
-      <stop offset="0%" stop-color="#FFDFA8" stop-opacity="0.95"/>
-      <stop offset="45%" stop-color="#FFDFA8" stop-opacity="0.45"/>
-      <stop offset="100%" stop-color="#0B0B12" stop-opacity="0"/>
-    </radialGradient>
-
-    <!-- Mask for gate silhouette -->
-    <mask id="gate-mask">
-      <rect width="100%" height="100%" fill="white"/>
-      <!-- carved negative space where gates open -->
-      <g id="mask-open" fill="black">
-        <!-- placeholder path for the opening; replace with designer path -->
-        <path d="M960 0 L960 1080 L1000 1080 L1000 0 Z"/>
-      </g>
-    </mask>
-  </defs>
-
-  <!-- Background -->
-  <g id="bg">
-    <rect id="bg-rect" width="100%" height="100%" fill="#0B0B12"/>
-    <rect id="bg-bloom" width="100%" height="100%" fill="url(#bloom)" opacity="0"/>
-    <g id="bg-particles" aria-hidden="true"></g>
-  </g>
-
-  <!-- Left gate -->
-  <g id="gate-left" transform-origin="left center">
-    <g id="gate-left-frame" filter="url(#soft-shadow)">
-      <!-- filigree paths here -->
-    </g>
-  </g>
-
-  <!-- Right gate -->
-  <g id="gate-right" transform-origin="right center">
-    <g id="gate-right-frame" filter="url(#soft-shadow)">
-      <!-- filigree paths here -->
-    </g>
-  </g>
-
-  <!-- Foreground overlay and copy -->
-  <g id="hero-overlay" pointer-events="none" aria-hidden="true">
-    <rect id="overlay-fade" width="100%" height="100%" fill="rgba(11,11,18,0.48)"/>
-    <g id="hero-copy" aria-hidden="true">
-      <!-- text placeholders; actual text rendered in HTML for accessibility -->
-    </g>
-  </g>
-</svg>
+## 2. Repo Layout and Import Paths
 ```
-**Notes for designers:**
-- Export separate groups for filigree-1, filigree-2, hinge, shadow, glint so JS can animate micro-parallax.
-- Keep path counts reasonable; split complex filigree into multiple paths to animate staggered parallax.
+/src
+  /components
+    HeroWrapper.jsx
+    HeroSVGInline.jsx
+    HeroPoster.jsx
+    HeroControls.js
+    HeroThreeScene.js
+  /styles
+    _hero-theme.scss
+  /assets
+    hero-1280.webp
+    hero-1920.webp
+    hero-3840.avif
+    gates-hero.svg
+    gates-hero-master.svg
+    gates-hero.lottie.json
+    cathedral-scene-draco.glb
+    /lightmap-tiles/*.webp
+    /audio/ambient-loop.aac
+    /portraits/*.webp
+    /frames/*.png
+/scripts
+  hero-control.js
+  hero-three-scene.js
+package.json
+```
 
-## 4. CSS keyframes, variables, and SCSS tokens (copy/paste)
-```css
-:root{
-  --gate-duration: 1.8s;
-  --gate-ease: cubic-bezier(.22,.9,.3,1);
-  --bloom-duration: 1.2s;
-  --particle-duration: 12s;
-  --cta-stagger: 120ms;
-  --color-bg: #0B0B12;
-  --color-gold: #D9B36A;
-  --color-altar: #B85A2A;
-  --text-primary: #F7F6F4;
-}
+**Lazy import example:**
+```javascript
+// in HeroWrapper.jsx
+if (capable) import('../scripts/hero-three-scene.js').then(m => m.initHeroScene());
+```
 
-/* Gate open animations */
-@keyframes gate-open-left {
-  0%   { transform: rotateY(0deg) translateX(0); }
-  40%  { transform: rotateY(-18deg) translateX(-6%); }
-  70%  { transform: rotateY(-28deg) translateX(-12%); }
-  100% { transform: rotateY(-32deg) translateX(-18%); }
-}
-@keyframes gate-open-right {
-  0%   { transform: rotateY(0deg) translateX(0); }
-  40%  { transform: rotateY(18deg) translateX(6%); }
-  70%  { transform: rotateY(28deg) translateX(12%); }
-  100% { transform: rotateY(32deg) translateX(18%); }
-}
-@keyframes bloom {
-  0%   { opacity: 0; transform: scale(0.96); }
-  50%  { opacity: 1; transform: scale(1.06); }
-  100% { opacity: 0.85; transform: scale(1); }
-}
-@keyframes particle-drift {
-  0%   { transform: translateY(0) translateX(0) scale(0.9); opacity:0.95; }
-  50%  { transform: translateY(-18vh) translateX(6vw) scale(1.05); opacity:0.6; }
-  100% { transform: translateY(0) translateX(0) scale(0.9); opacity:0.95; }
-}
+## 3. Key Code Snippets (Ready for Devs)
 
-/* Apply */
-#gate-left { transform-origin: left center; will-change: transform; }
-#gate-right { transform-origin: right center; will-change: transform; }
-.animate-gates #gate-left { animation: gate-open-left var(--gate-duration) var(--gate-ease) forwards; }
-.animate-gates #gate-right { animation: gate-open-right var(--gate-duration) var(--gate-ease) forwards; }
-.animate-gates #bg-bloom { animation: bloom var(--bloom-duration) var(--gate-ease) forwards; }
-#bg-particles > * { animation: particle-drift var(--particle-duration) linear infinite; will-change: transform, opacity; }
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .animate-gates #gate-left, .animate-gates #gate-right, #bg-particles, #bg-bloom { animation: none !important; transform: none !important; opacity: 1 !important; }
+### `package.json` snippet
+```json
+{
+  "name": "heavens-infrastructure",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "three": "^0.158.0",
+    "lottie-web": "^5.10.1"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  }
 }
 ```
 
-**SCSS color tokens (paste-ready):**
+### Minimal hero HTML structure (MVP)
+```html
+<div id="gates-hero-wrapper" class="hero-wrapper" role="region" aria-label="Ornate gates opening to a warm light">
+  <picture>
+    <source type="image/avif" srcset="/assets/hero-3840.avif 3840w, /assets/hero-1920.avif 1920w, /assets/hero-1280.avif 1280w" sizes="100vw">
+    <source type="image/webp" srcset="/assets/hero-3840.webp 3840w, /assets/hero-1920.webp 1920w, /assets/hero-1280.webp 1280w" sizes="100vw">
+    <img class="hero-poster" src="/assets/hero-1280.webp" alt="Cathedral interior with warm light shafts" loading="eager" decoding="async" width="1920" height="1080">
+  </picture>
+
+  <!-- Inline optimized SVG (gates-hero.svg) inserted here for animation control -->
+  <div id="hero-svg-container" class="hero-svg" aria-hidden="true"></div>
+
+  <!-- HTML copy for accessibility and SEO -->
+  <div id="hero-copy-html" class="hero-overlay" aria-hidden="true">
+    <h1>Welcome Home. We’ll Help You Build Your Church’s Presence.</h1>
+    <p>A sacred entrance to modern ministry — strategy, technology, and care that meet people where they are.</p>
+    <div class="hero-ctas">
+      <button id="primary-cta" class="cta-primary">Begin Your Free Audit</button>
+      <a href="/work" class="cta-secondary">See Our Work</a>
+    </div>
+  </div>
+
+  <button id="skip-intro" class="skip-intro" aria-controls="hero-copy-html">Skip the welcome</button>
+  <div id="hero-webgl" style="position:absolute;inset:0;pointer-events:none;"></div>
+</div>
+```
+
+### SCSS tokens and hero utilities (`_hero-theme.scss`)
 ```scss
+// tokens
 $color-bg: #0B0B12;
 $color-gold: #D9B36A;
 $color-altar: #B85A2A;
-$glass-blue: #1E4A7A;
-$glass-ruby: #8B1E3F;
 $text-primary: #F7F6F4;
+$hero-height-mobile: 65vh;
+$hero-height-desktop: 100vh;
 
-.hero-gradient {
-  background: linear-gradient(180deg, rgba(11,11,18,0.6) 0%, rgba(11,11,18,0.2) 60%), linear-gradient(120deg, rgba(217,179,106,0.08), rgba(184,90,42,0.06));
-}
-.cta-primary {
-  background: linear-gradient(90deg, $color-gold, $color-altar);
-  color: $text-primary;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-weight: 700;
-}
+// hero container
+.hero-wrapper { position:relative; height:$hero-height-mobile; @media(min-width:1024px){height:$hero-height-desktop;} background:$color-bg; overflow:hidden; color:$text-primary; }
+.hero-poster { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+.hero-svg { position:absolute; inset:0; z-index:1; pointer-events:none; }
+.hero-overlay { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; background:linear-gradient(180deg, rgba(11,11,18,0.12), rgba(11,11,18,0.48)); }
+.cta-primary { background:linear-gradient(90deg, $color-gold, $color-altar); color:$text-primary; padding:12px 22px; border-radius:10px; font-weight:700; }
+.skip-intro { position:absolute; top:18px; right:18px; z-index:10; background:rgba(255,255,255,0.06); color:$text-primary; padding:8px 12px; border-radius:8px; }
+@media (prefers-reduced-motion: reduce) { .hero-svg, .particle { animation:none !important; } }
 ```
 
-## 5. JavaScript scaffolds (control, skip, lazy load)
+### JS control scaffold (`hero-control.js`)
 ```javascript
-// hero-control.js
-const hero = document.getElementById('gates-hero-wrapper'); // wrapper div
-const svgShell = document.getElementById('gates-hero'); // inline SVG
+const hero = document.getElementById('gates-hero-wrapper');
 const skipBtn = document.getElementById('skip-intro');
 const primaryCta = document.getElementById('primary-cta');
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -177,9 +129,12 @@ const saveData = connection.saveData === true;
 const deviceMemory = navigator.deviceMemory || 4;
 
 function setFinalState() {
-  document.querySelector('#gate-left').style.transform = 'rotateY(-32deg) translateX(-18%)';
-  document.querySelector('#gate-right').style.transform = 'rotateY(32deg) translateX(18%)';
-  document.querySelector('#bg-bloom').style.opacity = '0.85';
+  const left = document.querySelector('#gate-left');
+  const right = document.querySelector('#gate-right');
+  const bloom = document.querySelector('#bg-bloom');
+  if (left) left.style.transform = 'rotateY(-32deg) translateX(-18%)';
+  if (right) right.style.transform = 'rotateY(32deg) translateX(18%)';
+  if (bloom) bloom.style.opacity = '0.85';
   showHeroCopy();
 }
 
@@ -197,117 +152,89 @@ function revealHero() {
   }
   hero.classList.add('animate-gates');
   requestIdleCallback(() => {
-    loadGLTFIfCapable();
-    lazyLoadAudio();
-  }, {timeout: 1500});
+    if (window.WebGLRenderingContext) import('../scripts/hero-three-scene.js').then(m => m.initHeroScene && m.initHeroScene());
+  }, {timeout:1500});
   setTimeout(showHeroCopy, 2000);
 }
 
-skipBtn.addEventListener('click', () => {
-  hero.classList.remove('animate-gates');
-  setFinalState();
-});
+skipBtn.addEventListener('click', () => { hero.classList.remove('animate-gates'); setFinalState(); });
+if (document.readyState === 'complete') revealHero(); else window.addEventListener('load', revealHero);
+```
 
-if (document.readyState === 'complete') revealHero();
-else window.addEventListener('load', revealHero);
+### Three.js scaffold outline (`hero-three-scene.js`)
+```javascript
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
-function lazyLoadAudio(){
-  const audioBtn = document.getElementById('play-ambient');
-  if (!audioBtn) return;
-  audioBtn.addEventListener('click', async () => {
-    const audio = new Audio('/assets/audio/ambient-loop.aac');
-    audio.loop = true;
-    await audio.play();
-    audioBtn.setAttribute('aria-pressed','true');
+export async function initHeroScene(){
+  const container = document.getElementById('hero-webgl');
+  if (!container) return;
+  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+  camera.position.set(0, 1.6, 6);
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+  scene.add(hemi);
+
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath('/libs/draco/');
+  const loader = new GLTFLoader();
+  loader.setDRACOLoader(dracoLoader);
+
+  const gltf = await loader.loadAsync('/assets/cathedral-scene-draco.glb');
+  scene.add(gltf.scene);
+
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 0.6, 0.4, 0.1));
+
+  const start = performance.now();
+  function animate(){
+    const t = (performance.now() - start) / 1000;
+    camera.position.z = 6 - Math.min(t * 0.6, 1.2);
+    composer.render();
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  container.addEventListener('pointermove', (e) => {
+    const x = (e.clientX / container.clientWidth) * 2 - 1;
+    const y = (e.clientY / container.clientHeight) * 2 - 1;
+    scene.rotation.y = x * 0.02;
+    scene.rotation.x = y * 0.01;
   });
-}
 
-function loadGLTFIfCapable(){
-  if (!window.WebGLRenderingContext) return;
-  import('/scripts/hero-three-scene.js').then(m => m.initHeroScene && m.initHeroScene());
+  window.heroScene = { scene, camera, renderer, composer };
 }
 ```
 
-## 6. Image strategy, responsive srcset, and color grading instructions
-```html
-<picture>
-  <source type="image/avif" srcset="/assets/hero-3840.avif 3840w, /assets/hero-1920.avif 1920w, /assets/hero-1280.avif 1280w" sizes="(min-width:1200px) 100vw, 100vw">
-  <source type="image/webp" srcset="/assets/hero-3840.webp 3840w, /assets/hero-1920.webp 1920w, /assets/hero-1280.webp 1280w" sizes="(min-width:1200px) 100vw, 100vw">
-  <img src="/assets/hero-1280.webp" alt="Cathedral interior with warm light shafts" loading="eager" decoding="async" width="1920" height="1080">
-</picture>
-```
-**Color grading LUT:**
-- Base LUT: warm highlights (+6% warmth), teal shadows (-4% blue shift), +8 saturation on jewel tones.
-- Film grain: 0.8% global grain.
-- Sharpening: 0.3 radius, 0.8 amount for web exports.
+## 4. Implementation Checklist & Rollout Plan
 
-## 7. Copy and microcopy
-**Hero headline:** Welcome Home. We’ll Help You Build Your Church’s Presence.
-**Hero subhead:** A sacred entrance to modern ministry — strategy, technology, and care that meet people where they are.
-**Primary CTA:** Begin Your Free Audit
-**Secondary CTA:** See Our Work
-**Skip control:** Skip the welcome
+**Week 1 MVP**
+- [ ] Add poster-first `<picture>` and inline `gates-hero.svg`.
+- [ ] Implement `hero-control.js` (skip, reduced-motion, lazy-load).
+- [ ] Ensure headline and CTAs are HTML text and keyboard accessible.
+- [ ] Track analytics events: `hero_intro_started`, `hero_intro_skipped`, `hero_intro_completed`, `primary_cta_clicked`.
 
-**Three pillar cards:**
-- Automate — Free your team from busywork. Automations for giving, follow-up, and scheduling.
-- Amplify — Get found. Local landing pages, SEO, and social storytelling that bring people in.
-- Accompany — 24/7 pastoral presence. AI companion with human escalation and real care.
+**Week 2 Enhancement**
+- [ ] Add Lottie fallback and shadered SVG microinteractions.
+- [ ] Add AI Companion widget and Prayer Wall MVP.
 
-**AI Companion widget:**
-- Label: Pastoral Companion — Ask, Pray, or Get Help
-- Entry: A caring guide that listens and routes urgent needs to real people. Not a replacement for emergency services.
+**Weeks 3–4 Premium**
+- [ ] Lazy-load Three.js GLTF scene with Draco compression and mobile LODs.
+- [ ] Add volumetric light, pointer interactions, and audio control (user-initiated).
+- [ ] Run A/B test: SVG vs WebGL vs Video loop.
 
-## 8. Accessibility, analytics, and QA checklist
-- Hero headline and CTAs must be HTML text.
-- Skip Intro button: visible, keyboard-focusable, aria-controls to hero content.
-- Respect prefers-reduced-motion and prefers-contrast.
-- Analytics events: hero_intro_started, hero_intro_skipped, hero_intro_completed, primary_cta_clicked.
-
-## SVG Defs Ready for Paste
-```svg
-<defs>
-  <filter id="soft-shadow" x="-50%" y="-50%" width="200%" height="200%">
-    <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
-    <feOffset in="blur" dx="0" dy="6" result="offset"/>
-    <feMerge>
-      <feMergeNode in="offset"/>
-      <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-  </filter>
-
-  <filter id="inner-depth" x="-20%" y="-20%" width="140%" height="140%">
-    <feComponentTransfer in="SourceAlpha"><feFuncA type="table" tableValues="0 0.9"/></feComponentTransfer>
-    <feGaussianBlur stdDeviation="2" result="innerBlur"/>
-    <feComposite in="innerBlur" in2="SourceAlpha" operator="in" result="innerMask"/>
-    <feMerge>
-      <feMergeNode in="innerMask"/>
-      <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-  </filter>
-
-  <radialGradient id="bloom" cx="50%" cy="38%" r="60%">
-    <stop offset="0%" stop-color="#FFDFA8" stop-opacity="0.98"/>
-    <stop offset="35%" stop-color="#FFDFA8" stop-opacity="0.48"/>
-    <stop offset="70%" stop-color="#D9B36A" stop-opacity="0.12"/>
-    <stop offset="100%" stop-color="#0B0B12" stop-opacity="0"/>
-  </radialGradient>
-
-  <linearGradient id="rim-warm" x1="0%" y1="0%" x2="100%" y2="0%">
-    <stop offset="0%" stop-color="#F7E6C2" stop-opacity="0.95"/>
-    <stop offset="50%" stop-color="#D9B36A" stop-opacity="0.85"/>
-    <stop offset="100%" stop-color="#B85A2A" stop-opacity="0.6"/>
-  </linearGradient>
-
-  <pattern id="grain" patternUnits="userSpaceOnUse" width="64" height="64">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAQCAYAAAB49l0/AAAAF0lEQVR42mNgGAWjYBSMglEwCjAAAw0AAc2m3qkAAAAASUVORK5CYII=" x="0" y="0" width="64" height="64" opacity="0.06"/>
-  </pattern>
-
-  <filter id="specular" x="-20%" y="-20%" width="140%" height="140%">
-    <feGaussianBlur stdDeviation="1.2" result="sblur"/>
-    <feMerge>
-      <feMergeNode in="sblur"/>
-      <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-  </filter>
-</defs>
-```
+**QA**
+- [ ] LCP ≤ 2.5s on throttled 4G; CLS < 0.1.
+- [ ] Accessibility audit: screen reader, keyboard nav, reduced-motion.
+- [ ] Performance audit: initial JS < 12 KB gzipped; Three.js lazy-loaded.
