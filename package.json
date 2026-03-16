@@ -6,6 +6,9 @@
     "three": "^0.158.0",
     "lottie-web": "^5.10.1"
   },
+  "devDependencies": {
+    "vite": "^5.1.4"
+  },
   "scripts": {
     "start": "vite",
     "build": "vite build"
